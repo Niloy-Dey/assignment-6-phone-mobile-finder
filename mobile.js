@@ -1,300 +1,151 @@
-// Spinner function 
+// toggle spinner
+const getSpinner = (control) => {
+  document.getElementById("spinner").style.display = control;
+};
+// toggle main section
+const main = (control) => {
+  document.getElementById("main").style.display = control;
+};
 
-const displaySpinner = display => {
-    document.getElementById('spinner-loading').style.display = display;
+
+
+const searchMobile = () => {
+  const searchResult = document.getElementById("input-field");
+  const searchValue = searchResult.value.toLowerCase();
+  if (searchValue == "") {
+    alert("please search mobile");
+  } 
+  else {
+    fetch(
+      `https://openapi.programming-hero.com/api/phones?search=${searchValue}`
+    )
+      .then((res) => res.json())
+      .then((data) => displayResult(data.data));
+    getSpinner("block");
+    main("none");
   }
-  
-  //Error Function
-  
-  const displayError = display => {
-    document.getElementById('error-found').style.display = display;
+  searchResult.value = "";
+};
+
+
+const displayResult = (phones) => {
+  const containerDiv = document.getElementById("container");
+  containerDiv.textContent = "";
+  const detail = (document.getElementById("details").textContent = "");
+
+  if (phones.length === 0) {
+    alert("no result found");
+    getSpinner("none");
+  } 
+  else {
+    phones?.slice(0, 20).forEach((phone) => {
+      const div = document.createElement("div");
+
+      div.innerHTML = `
+    <div class="col">
+            <div class="col">
+    <div class="card h-50 w-70 card-design border border-success">
+      <img src="${phone.image}" alt="${phone.phone_name}" class="card-img-top img-fluid"
+        style="height: 370px;  border-radius: 10px" alt="...">
+      <div class="card-body">
+        <table class="table">
+          <tbody class="text-start">
+            <tr>
+              <th>Phone Name</th>
+              <th>:</th>
+              <th>${phone.phone_name}</th>
+            </tr>
+            <tr>
+              <th>Brand</th>
+              <th>:</th>
+              <th>${phone.brand}</th>
+            </tr>
+            <tr>
+              <th>Phone slug</th>
+              <th>:</th>
+              <th>${phone.slug}</th>
+            </tr>
+
+          </tbody>
+
+        </table>
+        <div class="d-flex justify-content-center align-items-center">
+          <button onclick='detailsButton("${phone.slug}")' class=" secondary btn btn bg-success text-light">Details</button>
+        </div>
+      </div>
+    </div>
+  </div>
+          </div>
+    `;
+
+    containerDiv.appendChild(div);
+    });
+    getSpinner("none");
+    main("block");
   }
-  
-  //Displaying Default Content
-  
-  const displayContent = display => {
-    const contents = document.querySelectorAll('.content');
-    contents.forEach(content => content.style.display = display);
-  }
-  displayContent('none');
-  
+};
 
-//Searching function
 
-const searchPhone = () => {
-    document.getElementById('welcome').style.display = 'none';
-  
-    const searchField = document.getElementById("search-field");
-    const searchText = searchField.value;
-    searchField.value = '';
-    const url = `https://openapi.programming-hero.com/api/phones?search=${searchText}`;
-    console.log(url);
-  
-    // Error Handling 
-    if (searchText === '') {
-      displayError('block');
-      displayContent('none');
-  
-    } else {
-  
-      fetch(url)
-        .then((res) => res.json())
-        .then((data) => displaySearchResult(data));
-      displayError('none');
-      displaySpinner('block');
-      displayContent('none');
-    }
-  };
-  
-  //Displaying Result 
-  
-  const displaySearchResult = (phones) => {
-    console.log(phones);
-    const { data, status } = phones;
-    document.getElementById("search-count").textContent = `${status}`;
-  
-    const searchResult = document.getElementById("search-result");
-    searchResult.innerHTML = '';
-  
-    //Error Handling 
-  
-    if (data.length === 0) {
-      displaySpinner('none');
-      displayContent('none');
-      displayError('block');
-    }
-  
-    else {
-      displayContent('none');
-      displayError('none');
-      console.log(data[0]);
-      data.forEach((phone) => {
-        const div = document.createElement('div');
-        div.classList.add('col');
-  
-        // phone Cards Here
-  
-        div.innerHTML = `
-        <div class="card h-100 card-design border border-success">
-              <img src="${phone.image}" alt="${phone.phone_name}"
-                  class="card-img-top img-fluid" style="height: 370px; border: 1px solid green; border-radius: 10px" alt="...">
-              <div class="card-body">
-                  <table class="table">
-                      <tbody class="text-start">
-                          <tr>
-                              <th>Phone Name</th>
-                              <th>:</th>
-                              <th>${phone.phone_name}</th>
-                          </tr>
-                          <tr>
-                              <th>Brand</th>
-                              <th>:</th>
-                              <th>${phone.brand}</th>
-                          </tr>
-                          <tr>
-                              <th>Phone slug</th>
-                              <th>:</th>
-                              <th>${phone.slug}</th>
-                          </tr>
-                         
-                      </tbody>
-                      
-                  </table>
-                  <div class="d-flex justify-content-center align-items-center">
-                   <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">Phone Details</button>
-                  </div>
-  
-                  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Phone Details Modal</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-              <img src="${phone.image}" alt="${phone.phone_name}" class="card-img-top img-fluid"
-                style="height: 370px; border: 1px solid green; border-radius: 10px" alt="...">
-              <div class="card-body">
-                <table class="table">
-                  <tbody class="text-start">
-                    <tr>
-                      <th>Phone Name</th>
-                      <th>:</th>
-                      <th>${phone.phone_name}</th>
-                    </tr>
-                    <tr>
-                      <th>Brand</th>
-                      <th>:</th>
-                      <th>${phone.brand}</th>
-                    </tr>
-                    <tr>
-                      <th>Phone slug</th>
-                      <th>:</th>
-                      <th>${phone.slug}</th>
-                    </tr>
-            
-                  </tbody>
-                </table>
-              </div> 
-  
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-success">Save changes</button>
-        </div>
-        </div>
-        </div>
-              </div>
-             
-          </div>
-          `;
-        searchResult.appendChild(div);
-      });
-      displaySpinner('none');
-      displayContent('block');
-    }
-  };
-  
+const detailsButton = (id) => {
+  const url = `https://openapi.programming-hero.com/api/phone/${id}`;
+  fetch(url)
+    .then((res) => res.json())
+    .then((data) => detail(data.data));
+};
 
-  
-// Searching function
+const detail = (id) => {
+  console.log(id);
+  const detail = document.getElementById("details");
+  detail.textContent = "";
 
-const searchSinglePhone = () => {
-    document.getElementById('welcome').style.display = 'none';
-  
-    const searchField = document.getElementById("search-field");
-    const searchText = searchField.value;
-    searchField.value = '';
-    const url = `https://openapi.programming-hero.com/api/phones?search=${searchText}`;
-    console.log(url);
-  
-    // Error Handling 
-  
-    if (searchText === '') {
-  
-      displayError('block');
-      displayContent('none');
-  
-    } else {
-  
-      fetch(url)
-        .then((res) => res.json())
-        .then((data) => displaySingleSearchResult(data));
-      displayError('none');
-      displaySpinner('block');
-      displayContent('none');
-    }
-  };
-  
-  //Displaying Result 
-  
-  const displaySingleSearchResult = (phones) => {
-    console.log(phones);
-    const { data, status } = phones;
-    document.getElementById("search-count").textContent = `${status}`;
-  
-    const searchResult = document.getElementById("search-single-result");
-    searchResult.innerHTML = '';
-  
-  
-  
-    //Error Handling
-  
-    if (data.length === 0) {
-      displaySpinner('none');
-      displayContent('none');
-      displayError('block');
-    }
-  
-    else {
-      displayContent('none');
-      displayError('none');
-      console.log(data[0]);
-      data.forEach((phone) => {
-        const div = document.createElement('div');
-        div.classList.add('col');
-  
-  
-        // phone Cards Here 
-  
-        div.innerHTML = `
-        <div class="card h-100 card-design border border-success">
-              <img src="${phone.image}" alt="${phone.phone_name}"
-                  class="card-img-top img-fluid" style="height: 370px; border: 1px solid green; border-radius: 10px" alt="...">
-              <div class="card-body">
-                  <table class="table">
-                      <tbody class="text-start">
-                          <tr>
-                              <th>Phone Name</th>
-                              <th>:</th>
-                              <th>${phone.phone_name}</th>
-                          </tr>
-                          <tr>
-                              <th>Brand</th>
-                              <th>:</th>
-                              <th>${phone.brand}</th>
-                          </tr>
-                          <tr>
-                              <th>Phone slug</th>
-                              <th>:</th>
-                              <th>${phone.slug}</th>
-                          </tr>
-                         
-                      </tbody>
-                      
-                  </table>
-                  <div class="d-flex justify-content-center align-items-center">
-                   <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">Phone Details</button>
-                  </div>
-  
-                  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Phone Details Modal</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-              <img src="${phone.image}" alt="${phone.phone_name}" class="card-img-top img-fluid"
-                style="height: 370px; border: 1px solid green; border-radius: 10px" alt="...">
-              <div class="card-body">
-                <table class="table">
-                  <tbody class="text-start">
-                    <tr>
-                      <th>Phone Name</th>
-                      <th>:</th>
-                      <th>${phone.phone_name}</th>
-                    </tr>
-                    <tr>
-                      <th>Brand</th>
-                      <th>:</th>
-                      <th>${phone.brand}</th>
-                    </tr>
-                    <tr>
-                      <th>Phone slug</th>
-                      <th>:</th>
-                      <th>${phone.slug}</th>
-                    </tr>
-            
-                  </tbody>
-                </table>
-              </div> 
-  
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-success">Save changes</button>
-        </div>
-        </div>
-        </div>
-              </div>
-             
-          </div>
-          `;
-        searchResult.appendChild(div);
-      });
-      displaySpinner('none');
-      displayContent('block');
-    }
-  };
-  
+  const detailDiv = document.createElement("div");
+  detailDiv.innerHTML = `
+  <div class="card flex-lg-row ">
+      <div class="d-flex align-items-center justify-content-center"> 
+          <img style="width:30rem;" src="${id.image}" class="card-img-top img-fluid" alt="...">
+      </div>
+   <div class="card-body">
+        <h5 class="card-title"><b>Brand:</b> ${id.brand}</h5>
+        <p class="card-text"><b>Model:</b> ${id.name}</p>
+      
+   <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+              <p><b>Release:</b> ${id.releaseDate ? id.releaseDate : "not available"}</p>
+        </li>
+        <li class="list-group-item">
+              <p><b>Chipset:</b> ${id.mainFeatures?.chipSet ? id.mainFeatures?.chipSet : "no information"}</p>
+        </li>
+      <li class="list-group-item">
+            <p><b>Display:</b> ${id.mainFeatures?.displaySize? id.mainFeatures?.displaySize: "no information"}</p>
+        </li>
+        <li class="list-group-item">
+              <p><b>Storage:</b> ${id.mainFeatures?.memory ? id.mainFeatures?.memory : "no information"}</p>
+        </li>
+        <li class="list-group-item">
+              <p><b>Sensors:</b> ${id.mainFeatures.sensors}</p>
+        </li>
+        <li class="list-group-item">
+              <p><b>Wifi:</b> ${id.others?.WLAN ? id.others?.WLAN : "no information"}</p>
+        </li>
+        <li class="list-group-item">
+            <p><b>Bluetooth:</b> ${id.others?.Bluetooth ? id.others?.Bluetooth : "no information"}</p>
+        </li>
+        <li class="list-group-item">
+            <p><b>Radio:</b> ${id.others?.Radio ? id.others?.Radio : "no information"}</p>
+        </li>
+        <li class="list-group-item">
+            <p><b>NFC:</b> ${id.others?.NFC ? id.others?.NFC : "no information"}</p>
+        </li>
+        <li class="list-group-item">
+          <p><b>GPS:</b> ${id.others?.GPS ? id.others?.GPS : "no information"}</p>
+        </li>
+        <li class="list-group-item">
+            <p><b>USB:</b> ${id.others?.USB ? id.others?.USB : "no information"}</p>
+        </li>
+     </ul>
+  </div>
+</div> `;
+  detail.appendChild(detailDiv);
+};
+
+// Code end
