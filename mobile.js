@@ -1,3 +1,24 @@
+//////////////////// Spinner function ///////////////////
+
+const displaySpinner = display => {
+    document.getElementById('spinner-loading').style.display = display;
+  }
+  
+  //////////////// Error Function //////////////////////////
+  
+  const displayError = display => {
+    document.getElementById('error-found').style.display = display;
+  }
+  
+  ////////////// Displaying Default Content //////////////////
+  
+  const displayContent = display => {
+    const contents = document.querySelectorAll('.content');
+    contents.forEach(content => content.style.display = display);
+  }
+  displayContent('none');
+  
+
 ////////////////// Searching function ///////////////////////
 
 const searchPhone = () => {
